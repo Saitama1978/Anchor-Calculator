@@ -3,8 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,34 +24,14 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Debug - List Files
-      run: |
-        echo "=== Saan nakalagay ang mga file? ==="
-        ls -la
-        echo "====================================="
-
     - name: Install Dependencies
-      run: |
-        if [ -f "pubspec.yaml" ]; then
-          flutter pub get
-        elif [ -f "Anchor-Calculator/pubspec.yaml" ]; then
-          cd Anchor-Calculator && flutter pub get
-        else
-          echo "Error: Hindi talaga mahanap ang pubspec.yaml!" && exit 1
-        fi
+      run: flutter pub get
 
     - name: Build APK
-      run: |
-        if [ -f "pubspec.yaml" ]; then
-          flutter build apk --release
-        else
-          cd Anchor-Calculator && flutter build apk --release
-        fi
+      run: flutter build apk --release
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: release-apk
-        path: |
-          build/app/outputs/flutter-apk/app-release.apk
-          Anchor-Calculator/build/app/outputs/flutter-apk/app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
