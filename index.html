@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anchor Circle Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #1a252f; color: white; }
+        .container { max-width: 400px; margin: auto; background: #2c3e50; padding: 20px; border-radius: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { background-color: #27ae60; color: white; font-weight: bold; cursor: pointer; }
+        .result { background: #34495e; padding: 15px; margin-top: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚓ Anchor Scope & Turning Circle</h2>
+    
+    <label>Water Depth (meters):</label>
+    <input type="number" id="depth" placeholder="E.g., 20">
+
+    <label>Ship's LOA (meters):</label>
+    <input type="number" id="loa" placeholder="E.g., 180">
+
+    <label>Shackles to Let Go:</label>
+    <input type="number" id="shackles" value="7">
+
+    <button onclick="calculateMetrics()">Calculate</button>
+
+    <div class="result" id="output" style="display:none;">
+        <h3>📋 Results:</h3>
+        <p id="totalChain"></p>
+        <p id="turningRadius"></p>
+        <p id="scopeRatio" style="font-weight: bold;"></p>
+    </div>
+</div>
+
+<script>
+function calculateMetrics() {
+    let depth = parseFloat(document.getElementById('depth').value);
+    let loa = parseFloat(document.getElementById('loa').value);
+    let shackles = parseFloat(document.getElementById('shackles').value);
+    
+    let shackleInMeters = 27.5; // 1 shackle = 27.5m
+    let totalChainMeters = shackles * shackleInMeters;
+    
+    // Formula para sa Turning Circle Radius
+    let radius = totalChainMeters + loa;
+    
+    // Scope Ratio (Chain Length / Depth) - Importante sa Seamanship para malaman kung kakagat ang angkla
+    let scope = totalChainMeters / depth;
+
+    document.getElementById('totalChain').innerText = "Total Chain in Water: " + totalChainMeters + " meters";
+    document.getElementById('turningRadius').innerText = "Turning Circle Radius: " + radius + " meters";
+    
+    let scopeStatus = "";
+    if (scope < 3) {
+        scopeStatus = "⚠️ Scope Warning: Masyadong maikli ang kadena! (Ratio: " + scope.toFixed(1) + ")";
+    } else if (scope >= 3 && scope <= 5) {
+        scopeStatus = "✅ Scope OK: Maganda ang kapit sa Good Weather. (Ratio: " + scope.toFixed(1) + ")";
+    } else {
+        scopeStatus = "🌊 Scope Heavy: Ligtas para sa Rough Weather. (Ratio: " + scope.toFixed(1) + ")";
+    }
+    
+    document.getElementById('scopeRatio').innerText = scopeStatus;
+    document.getElementById('output').style.display = "block";
+}
+</script>
+
+</body>
+</html>
