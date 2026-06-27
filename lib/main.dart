@@ -17,6 +17,13 @@ class AnchorCalculatorApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: Colors.blueGrey[900],
         scaffoldBackgroundColor: const Color(0xFF121B22),
+        // Ginawang mas modern ang look ng mga Input Border
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.teal, width: 2.0),
+          ),
+        ),
       ),
       home: const CalculatorScreen(),
     );
@@ -47,15 +54,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
     if (depth <= 0 || loa <= 0 || shackles <= 0) {
       setState(() {
-        _statusMessage = "Paki-kumpleto ang mga detalye.";
+        _statusMessage = "⚠️ Paki-kumpleto ang mga detalye.";
         _statusColor = Colors.orange;
+        _totalChain = 0.0; // I-reset para hindi lumabas ang lumang kalkulasyon
       });
       return;
     }
 
-    // 1 shackle = 27.5 meters
+    // 1 shackle = 27.5 meters (15 fathoms)
     double chainInMeters = shackles * 27.5;
-    // Turning Circle Radius = Chain Length + LOA
+    // Turning Circle Radius = Chain Length + LOA (Length Overall of ship)
     double radius = chainInMeters + loa;
     // Scope Ratio = Chain Length / Depth
     double scope = chainInMeters / depth;
@@ -78,6 +86,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   @override
+  void dispose() {
+    // Magandang habit ang i-dispose ang controllers para iwas memory leak
+    _depthController.dispose();
+    _loaController.dispose();
+    _shacklesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -93,31 +110,28 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               TextField(
                 controller: _depthController,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Water Depth (Meters)',
-                  border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.waves),
                 ),
               ),
               const SizedBox(height: 15),
               TextField(
                 controller: _loaController,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: "Ship's LOA (Meters)",
-                  border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.directions_boat),
                 ),
               ),
               const SizedBox(height: 15),
               TextField(
                 controller: _shacklesController,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Shackles to Let Go',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.chains),
+                  prefixIcon: Icon(Icons.link), // Pinalitan ng valid icon dahil walang Icons.chains sa standard flutter
                 ),
               ),
               const SizedBox(height: 20),
@@ -130,18 +144,24 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: const Text('CALCULATE', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
               const SizedBox(height: 25),
-              if (_totalChain > 0) ...[
+              
+              // Lalabas lang ang resulta o error kapag may mensahe na
+              if (_statusMessage.isNotEmpty) ...[
                 Card(
                   color: Colors.blueGrey[800],
+                  elevation: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    with: Column(
+                    // INAYOS: Mula sa 'with: Column' papuntang 'child: Column'
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Total Chain in Water: $_totalChain m', style: const TextStyle(fontSize: 16)),
-                        const SizedBox(height: 10),
-                        Text('Turning Circle Radius: $_turningCircle m', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 15),
+                        if (_totalChain > 0) ...[
+                          Text('Total Chain in Water: ${_totalChain.toStringAsFixed(1)} m', style: const TextStyle(fontSize: 16)),
+                          const SizedBox(height: 10),
+                          Text('Turning Circle Radius: ${_turningCircle.toStringAsFixed(1)} m', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 15),
+                        ],
                         Text(_statusMessage, style: TextStyle(fontSize: 14, color: _statusColor, fontWeight: FontWeight.bold)),
                       ],
                     ),
