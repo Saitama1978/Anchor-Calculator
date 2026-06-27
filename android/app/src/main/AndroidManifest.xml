@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.google.com/apk/res/android">
+    <application
+        android:label="Anchor Calculator"  android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        
+        <activity
+            android:name=".MainActivity"
+            ...
