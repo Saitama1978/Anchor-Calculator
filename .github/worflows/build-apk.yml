@@ -14,10 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # HETO ANG DINAGDAG: Lilikha ito ng kulang na Android files kung sakaling wala pa sa repo mo
-      - name: Repair/Create Flutter Project Configurations
+      - name: Repair and Create Flutter Android Project
         run: flutter create --platforms=android .
 
+      # HETO ANG DINAGDAG: Ipilit natin ang tamang AndroidManifest na ginawa mo kanina
+      - name: Inject AndroidManifest
+        run: |
+          mkdir -p android/app/src/main
+          echo '<manifest xmlns:android="http://schemas.google.com/apk/res/android"><application android:label="Anchor Calculator" android:icon="@mipmap/ic_launcher"><activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize"><meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme"/><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity><meta-data android:name="flutterEmbedding" android:value="2"/></application></manifest>' > android/app/src/main/AndroidManifest.xml
+
+       Taru-setup ang Java Development Kit (JDK)
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
