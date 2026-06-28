@@ -1,6 +1,5 @@
 name: Flutter APK Build
 
-# Awtomatikong tatakbo ito tuwing mag-pu-push ka sa 'main' o 'master' branch
 on:
   push:
     branches: [ main, master ]
@@ -12,33 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. I-checkout ang iyong code mula sa repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. I-setup ang Java Development Kit (JDK) na kailangan ng Android
+      # HETO ANG DINAGDAG: Lilikha ito ng kulang na Android files kung sakaling wala pa sa repo mo
+      - name: Repair/Create Flutter Project Configurations
+        run: flutter create --platforms=android .
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      # 3. I-setup ang Flutter environment
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          # Awtomatikong gagamitin ang version na nasa pubspec.yaml mo kapag tinanggal ang version line
 
-      # 4. Kuhanin ang mga packages/dependencies ng iyong app
       - name: Install dependencies
         run: flutter pub get
 
-      # 5. I-build ang release APK (ito ang i-o-optimize na bersyon)
       - name: Build APK
         run: flutter build apk --release
 
-      # 6. I-upload ang APK para pwede mo itong ma-download mula sa GitHub
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
